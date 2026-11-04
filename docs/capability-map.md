@@ -11,11 +11,11 @@
 | Readable workbook validator | scripts/validate_testcases.py | 選取無公司依賴的實作，修正分數步驟、空數量及空輸入檢查 |
 | 測試設計技法與 evidence lane | qa/methodology/test-design.md | EP/BVA/DT/ST/UC 核心方法通用摘要 |
 | Test Case Excel 與 Word 報告 | qa/templates/、scripts/ | 以文字來源生成，移除舊 binary metadata |
-| API/UI 回歸框架 | automation/src/、automation/tests/ | 保留 fixture/client/Page Object/metadata 分層，重寫 synthetic 範例 |
+| API/UI 回歸框架 | automation/src/、automation/tests/ | 保留 fixture/client/Page Object/metadata；UI 使用 Playwright 與獨立 browser context |
 | 跨環境回歸 | LiveSettings、tests/live/ | 明確設定、opt-in，不 fallback 或保留服務位址 |
 | Protocol harness | tests/protocol/ | 最小本機 OCPP-J correlation 示範；未搬完整業務模擬器 |
 | 分批／同步壓測與報表 | qa_demo/load.py | bounded local workload、逐筆 evidence、p95/error gate |
-| pytest/Jenkins/Allure/CI | pyproject.toml、Jenkinsfile、.github/ | 通用 pipeline，無公司 runner／通知／排程 |
+| pytest/Jenkins/Allure/CI | pyproject.toml、Jenkinsfile、.github/ | UI browser matrix 與失敗 trace／截圖，無公司 runner／通知／排程 |
 | 進度摘要／跨模型交接 | operations/ | 保留檔案 handoff；不攜帶工作台及歷史資料 |
 | 專屬產品 Skill／tracker routing | config/project.example.json | 改為空白接入點，等新需求填入 |
 

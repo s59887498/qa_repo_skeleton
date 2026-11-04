@@ -2,7 +2,24 @@
 
 驗證日期：2026-11-04。驗證範圍為此模板的 synthetic examples 與工具，不是任何公司的產品測試。
 
-## 已完成的本機檢查
+## Playwright 切換驗證
+
+版本：Python 3.14.3、pytest 9.2.0、Playwright 1.64.1、pytest-playwright 0.10.0。UI 套件已切換，模板 venv 不再安裝 Selenium。
+
+| 項目 | 結果 |
+| --- | --- |
+| 完整回歸＋Chromium UI＋WebSocket | 34 passed、1 skipped；skip 是未啟用的 live lane |
+| Firefox UI／附件整合檢查 | 2 passed |
+| WebKit UI／附件整合檢查 | 2 passed |
+| 失敗附件政策 | 三種 browser 均驗證：刻意失敗留下可讀 trace ZIP／PNG；成功不保留 |
+| Case ID／結果整合 | UI 與 API 資料一致；JSON 記 browser，Allure 保留 ID／標題／steps／expected |
+| Optional UI 與分 run 規則 | 無 plugin 的 core run 可用；明確要求 UI 卻缺 plugin 會失敗；同次多 browser 會提示分開執行 |
+| Skill／語法／文件連結／Ruff | 通過 |
+
+本機 pytest 9.2 對上游 plugin 的 session-scoped `base_url` fixture 顯示一筆 deprecation warning；測試通過，套件範圍仍限制 pytest < 10。沒有隱藏 warning 或修改第三方套件。
+Jenkins UI stage 已加入，但未在真實 Jenkins instance 執行。GitHub CI 設定為兩個 Python core jobs 與三個 browser jobs，實際狀態以該 commit 的 Actions runs 為準。
+
+## 初始模板驗證（保留紀錄）
 
 | 項目 | 結果 |
 | --- | --- |
@@ -26,11 +43,15 @@ Jenkinsfile 提供可接入範例，未在遠端 Jenkins instance 執行。真�
 ```sh
 python scripts/check_template.py
 ruff check .
-python -m pytest --run-ui --run-protocol --junitxml=artifacts/junit.xml --results-json=artifacts/results.json
+python -m playwright install chromium
+python -m pytest --run-ui --run-protocol --browser chromium \
+  --tracing retain-on-failure --screenshot only-on-failure \
+  --output artifacts/ui/chromium/playwright \
+  --junitxml=artifacts/junit.xml --results-json=artifacts/results.json
 python scripts/export_cases.py qa/examples/catalog-cases.json artifacts/Demo_Readable.xlsx
 python scripts/validate_testcases.py artifacts/Demo_Readable.xlsx --warnings-as-errors
 python -m qa_demo.load --mode staggered --requests 80 --workers 8
 python -m qa_demo.load --mode simultaneous --requests 80 --workers 8
 ```
 
-Runtime 產物保存在被忽略的 artifacts/，沒有加入模板 Git 歷史。GitHub CI 另驗證 Python 3.11／3.13 及獨立 browser lane，實際結果以該 commit 的 Actions runs 為準。
+Runtime 產物保存在被忽略的 artifacts/，沒有加入模板 Git 歷史。完整安裝與跨瀏覽器指令見 [UI 指南](../automation/docs/ui-playwright.md)。

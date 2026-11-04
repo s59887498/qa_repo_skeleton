@@ -8,9 +8,9 @@
 ## 需要重新設定
 
 - `config/project.local.json`：project、owner、timezone、source registry、環境與 tracker destination。example 僅作結構，不直接當 live 設定。
-- `.env`／secret manager：API base URL、token、帳號、瀏覽器／driver 路徑；不複製舊 `.env` 或 shell history。
+- `.env`／secret manager：API base URL、token、帳號；不複製舊 `.env` 或 shell history。UI 瀏覽器由 Playwright 安裝，離線環境另設定配對版本的 browser cache。
 - `qa/docs/`：新 PRD、RA、UI/Figma、OpenAPI、RBAC、版本；不搬舊公司的真實規格與圖片。
-- `automation/`：API adapter、authentication、selector、測資與 cleanup；先以新契約建 mapping，再接真實環境。
+- `automation/`：API adapter、authentication、selector、測資與 cleanup；先以新契約建 mapping，再接真實環境。新 UI 專案預設 Playwright；接手既有框架時先評估相容性與遷移範圍。
 - Bug routing：Asana/Jira/GitHub provider、project、parent、section，保留空白直到本次指定。若需 connector，使用自己的登入與 permission。
 - CI：runner、Python、套件來源、artifact retention、secret scope、live job；預設 CI 沒有排程與真實環境執行。
 - Agent：從新 repo root 開啟，確認三個 roles 與十個 Skills 可用。MCP credentials、app plugins、個人 Codex config 需各自設定，並未打包。
@@ -19,7 +19,7 @@
 ## 接入驗證順序
 
 1. 安裝並跑模板檢查、local regression、protocol、文件工具測試。
-2. 啟用 UI lane，確認 browser／driver 與本機範例。
+2. 安裝 Playwright 配對瀏覽器，依 [UI 指南](../automation/docs/ui-playwright.md) 啟用 UI lane，確認本機範例與失敗 trace／截圖。
 3. 補新來源與 project profile，先做 Source Gate 和 Test Plan／Cases。
 4. 已確認契約且授權後才跑 live read-only smoke；核對 token 不會跨環境。
 5. 建立隔離測資與 owned cleanup，再接 mutation regression／壓測。

@@ -42,3 +42,30 @@ def test_execution_record_keeps_nonpassing_phases(tmp_path, fixture_code, test_c
         allure_result = json.loads(next((tmp_path / "allure").glob("*-result.json")).read_text())
         assert allure_result["name"] == "DEMO-001 Synthetic"
         assert "Expected" in allure_result["description"]
+
+
+@pytest.mark.parametrize("scenario", ["core_only", "missing_plugin", "multiple_browsers"])
+def test_ui_opt_in_and_single_browser_contract(tmp_path, scenario):
+    (tmp_path / "conftest.py").write_text((ROOT / "conftest.py").read_text())
+    (tmp_path / "pytest.ini").write_text("[pytest]\nmarkers =\n    ui: local browser\n")
+    (tmp_path / "test_example.py").write_text(
+        "import pytest\ndef test_core():\n    assert True\n"
+        "@pytest.mark.ui\ndef test_ui(page):\n    raise AssertionError('must not run')\n"
+    )
+    command = [sys.executable, "-m", "pytest", "-q"]
+    if scenario == "missing_plugin":
+        command += ["--run-ui"]
+    elif scenario == "multiple_browsers":
+        pytest.importorskip("pytest_playwright")
+        command += ["-p", "playwright", "--run-ui", "--browser", "chromium", "--browser", "firefox"]
+    result = subprocess.run(
+        command, cwd=tmp_path, capture_output=True, text=True, timeout=30,
+        env={**os.environ, "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"},
+    )
+    if scenario == "core_only":
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "1 passed, 1 skipped" in result.stdout
+    else:
+        assert result.returncode == 4, result.stdout + result.stderr
+        message = "requires pytest-playwright" if scenario == "missing_plugin" else "one browser per run"
+        assert message in result.stderr

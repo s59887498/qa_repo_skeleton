@@ -1,24 +1,19 @@
-"""Page object owns locators and explicit waits; tests own behavior assertions."""
+"""Playwright page object owns locators/actions; tests own observable assertions."""
 
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
+from playwright.sync_api import Locator, Page
 
 
 class CatalogPage:
-    NAME = (By.CSS_SELECTOR, '[data-testid="item-name"]')
-    CREATE = (By.CSS_SELECTOR, '[data-testid="create-item"]')
-    RESULT = (By.CSS_SELECTOR, '[data-testid="result"]')
-
-    def __init__(self, driver):
-        self.driver = driver
-        self.wait = WebDriverWait(driver, 5)
+    def __init__(self, page: Page):
+        self.page = page
+        self.name = page.get_by_label("項目名稱", exact=True)
+        self.create_button = page.get_by_role("button", name="建立項目", exact=True)
+        self.result = page.get_by_role("status")
 
     def open(self, base_url):
-        self.driver.get(base_url + "/ui")
+        self.page.goto(base_url + "/ui")
 
-    def create(self, name):
-        self.wait.until(EC.visibility_of_element_located(self.NAME)).send_keys(name)
-        self.wait.until(EC.element_to_be_clickable(self.CREATE)).click()
-        self.wait.until(EC.text_to_be_present_in_element(self.RESULT, "已建立"))
-        return self.driver.find_element(*self.RESULT)
+    def create(self, name: str) -> Locator:
+        self.name.fill(name)
+        self.create_button.click()
+        return self.result

@@ -34,16 +34,28 @@ jobs:
           retention-days: 7
   browser-example:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - run: python -m pip install -e '.[ui]'
-      - run: python -m pytest automation/tests/ui --run-ui --junitxml=artifacts/ui.xml --results-json=artifacts/ui.json
+      - run: python -m pip install -e '.[ui,reports]'
+      - run: python -m playwright install --with-deps ${{ matrix.browser }}
+      - run: >-
+          python -m pytest automation/tests/ui tests/test_playwright_integration.py
+          --run-ui --browser ${{ matrix.browser }}
+          --tracing retain-on-failure --screenshot only-on-failure
+          --output artifacts/ui/${{ matrix.browser }}/playwright
+          --junitxml=artifacts/ui/${{ matrix.browser }}/junit.xml
+          --results-json=artifacts/ui/${{ matrix.browser }}/results.json
+          --alluredir=artifacts/ui/${{ matrix.browser }}/allure-results
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: browser-results
+          name: browser-results-${{ matrix.browser }}
           path: artifacts/
           retention-days: 7

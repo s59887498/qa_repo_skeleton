@@ -42,6 +42,11 @@ def build_report(data, evidence_source):
              f"Runner exit code：{safe(data.get('exit_code', '未知'))}", "",
              "| Status | Count |", "| --- | ---: |"]
     lines.extend(f"| {state} | {counts[state]} |" for state in STATES)
+    if ui := data.get("ui"):
+        lines += ["", f"UI browser：{safe(ui['browser'])}",
+                  f"Playwright artifacts directory：{safe(ui['output'])}",
+                  f"Capture policy：trace={safe(ui['tracing'])}, screenshot={safe(ui['screenshot'])}",
+                  "附件是否存在需依實際檔案確認；錄製政策不代表已產生附件。"]
     lines += ["", "| Case ID | Title | Status | Actual |", "| --- | --- | --- | --- |"]
     lines.extend("| " + " | ".join(safe(result[key]) for key in ("case_id", "title", "status", "actual")) + " |"
                  for result in data["results"])

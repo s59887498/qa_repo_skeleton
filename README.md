@@ -1,6 +1,6 @@
 # QA Repo Skeleton
 
-可帶到下一個專案的 QA 工作底座：AI Agent、Skills、測試設計、文件產生、pytest API/UI/Protocol 範例、回歸分層、壓測及 CI。
+可帶到下一個專案的 QA 工作底座：AI Agent、Skills、測試設計、文件產生、pytest API／Playwright UI／Protocol 範例、回歸分層、壓測及 CI。
 
 此 repo 不含任何公司的實際需求、帳密、客戶／設備資料、內部服務網址或歷史測試結果。`Demo Catalog` 是虛構的本機示範系統。測試通過只代表模板可運作。
 
@@ -71,9 +71,13 @@ Agent TOML 與 Skills 位置依 [官方 Agent 文件](https://learn.chatgpt.com/
 python -m pytest -m smoke
 python -m pytest -m 'regression and not ui'
 
-# Selenium + Chrome；首次可能需下載 driver
+# Playwright UI：安裝套件與配對瀏覽器，失敗保留 trace／截圖
 python -m pip install -e '.[ui]'
-python -m pytest automation/tests/ui --run-ui
+python -m playwright install chromium
+python -m pytest automation/tests/ui --run-ui --browser chromium \
+  --tracing retain-on-failure --screenshot only-on-failure \
+  --output artifacts/ui/chromium/playwright \
+  --junitxml=artifacts/ui/chromium/junit.xml --results-json=artifacts/ui/chromium/results.json
 
 # 最小 OCPP-J Heartbeat request/response 範例，只連本機
 python -m pytest automation/tests/protocol --run-protocol
@@ -83,10 +87,11 @@ python -m qa_demo.load --mode staggered --requests 80 --workers 8
 python -m qa_demo.load --mode simultaneous --requests 80 --workers 8
 ```
 
-UI optional dependencies 不存在或瀏覽器啟動失敗時，明確選入的 lane 會失敗；不悄悄當作成功。預設 skip 的 live/UI/protocol 不算 Passed。
+UI optional dependencies 不存在或配對瀏覽器未安裝時，明確選入的 lane 會失敗；不悄悄當作成功。預設 skip 的 live/UI/protocol 不算 Passed。
+新 UI 專案預設 Python＋pytest＋Playwright；既有專案先沿用其框架。每 run 選一個 browser，GitHub CI 分別執行 Chromium／Firefox／WebKit。單獨加 `--run-ui` 只會啟用測試，錄製與截圖由上列 flags 控制。
 壓測的 error rate、p50/p95、RPS 及逐筆結果寫入 `artifacts/load/<run-id>/`。這是可重用的負載組織範例，不是任何產品的效能承諾；遠端壓測需另接 adapter 與確認 SLO/授權。
 
-詳細說明：[Automation](automation/README.md)、[回歸分層](automation/docs/regression-strategy.md)、[負載模型](automation/docs/load-testing.md)。
+詳細說明：[Automation](automation/README.md)、[Playwright UI 與 evidence](automation/docs/ui-playwright.md)、[回歸分層](automation/docs/regression-strategy.md)、[負載模型](automation/docs/load-testing.md)。
 
 ## Test Case 與 Report
 

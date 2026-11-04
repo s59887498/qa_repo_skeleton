@@ -30,3 +30,6 @@ operations/progress/*
 *.pfx
 *.har
 storage-state*.json
+test-results/
+playwright/.auth/
+.playwright/

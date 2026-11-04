@@ -176,7 +176,7 @@
       "priority": "High",
       "state": "Not Started",
       "source": "qa/examples/catalog-requirements.md#demo-req-005",
-      "preconditions": "已啟動本機服務，已安裝 Selenium 與 Chrome/driver。",
+      "preconditions": "已啟動本機服務，已安裝 Playwright、pytest plugin 與本次指定的配對瀏覽器。",
       "tags": [
         "Regression",
         "Technique_UC"

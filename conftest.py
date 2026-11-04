@@ -8,15 +8,28 @@ import pytest
 
 
 def pytest_addoption(parser):
-    parser.addoption("--run-ui", action="store_true", help="Run local Selenium examples")
+    parser.addoption("--run-ui", action="store_true", help="Run local Playwright examples")
     parser.addoption("--run-protocol", action="store_true", help="Run local WebSocket examples")
     parser.addoption("--run-live", action="store_true", help="Run configured live read-only tests")
     parser.addoption("--results-json", help="Write a machine-readable execution record")
 
 
 def pytest_configure(config):
+    if config.getoption("--run-ui"):
+        if not config.pluginmanager.hasplugin("playwright"):
+            raise pytest.UsageError("--run-ui requires pytest-playwright; install the 'ui' extra first")
+        if len(config.getoption("--browser")) > 1:
+            raise pytest.UsageError("Select one browser per run to keep Case IDs unique; use separate CI matrix jobs")
     config._qa_results = {}
     config._qa_started_at = datetime.now(timezone.utc).isoformat()
+    config._qa_ui = None
+    if config.getoption("--run-ui"):
+        config._qa_ui = {
+            "browser": next(iter(config.getoption("--browser")), "chromium"),
+            "tracing": config.getoption("--tracing"),
+            "screenshot": config.getoption("--screenshot"),
+            "output": config.getoption("--output"),
+        }
 
 
 @pytest.hookimpl(hookwrapper=True, tryfirst=True)
@@ -52,10 +65,14 @@ def pytest_collection_modifyitems(config, items):
             raise pytest.UsageError(f"Incomplete case metadata: {case_id}")
         seen.add(case_id)
         item.user_properties.extend([("case_id", case_id), ("title", title)])
+        browser = (config._qa_ui or {}).get("browser") if item.get_closest_marker("ui") else None
+        if browser:
+            item.user_properties.append(("browser", browser))
         config._qa_results[item.nodeid] = {
             "case_id": case_id, "title": title, "status": "not_run",
             "actual": "Not executed", "evidence": [],
             "lane": next((lane for lane in ("live", "ui", "protocol") if item.get_closest_marker(lane)), "local"),
+            "browser": browser,
         }
 
 
@@ -90,5 +107,6 @@ def pytest_sessionfinish(session, exitstatus):
         "started_at": session.config._qa_started_at,
         "finished_at": datetime.now(timezone.utc).isoformat(),
         "exit_code": int(exitstatus),
+        "ui": session.config._qa_ui,
         "results": list(session.config._qa_results.values()),
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

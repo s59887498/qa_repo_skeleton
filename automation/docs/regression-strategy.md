@@ -6,12 +6,13 @@
 | --- | --- | --- | --- |
 | Smoke | 服務／關鍵入口 | `python -m pytest -m smoke` | 每次變更 |
 | API regression | 行為、schema、RBAC、boundary、lifecycle | `python -m pytest automation/tests/api` | PR／回歸 |
-| UI | 操作及跨層資料一致性 | `python -m pytest automation/tests/ui --run-ui` | UI 變更／nightly |
+| UI | Playwright 操作及跨層資料一致性 | `python -m pytest automation/tests/ui --run-ui --browser chromium` | UI 變更／nightly |
 | Protocol | message envelope、correlation、timeout | `python -m pytest automation/tests/protocol --run-protocol` | protocol 變更 |
 | Live read-only | 已確認 target 的健康檢查 | `python -m pytest automation/tests/live --run-live` | 明確授權時 |
 | Load | request 總量、並行、延遲／錯誤率 | `python -m qa_demo.load` | 獨立效能任務 |
 
 本模板只設定 push/PR CI，沒有自動建立 nightly schedule。
+UI evidence 的完整執行指令見 [Playwright 指南](ui-playwright.md)。一個 run 選一個 browser；CI matrix 為 Chromium、Firefox、WebKit 各產生獨立 JSON/JUnit/Allure 與失敗附件，不能將三份同 ID 結果直接加總成三個不同 Case。
 
 新增 feature：先有 Reviewed Cases 與 source registry，再放 `automation/tests/api/test_<feature>_regression.py`；可重用 client／helper 放 src，測資放 data，真實 asset ID 放 local config。
 每組參數是獨立案例時，使用 `pytest.param(..., marks=pytest.mark.case(...))` 保持不同 ID。Title 短且人可讀，steps/expected 分欄；不把整段 payload 塞到報表標題。

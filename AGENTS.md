@@ -8,6 +8,7 @@
 - 不憑空建立需求、API path、permission、預期結果或執行證據。來源缺漏、衝突、版本不符分開記錄。缺憑證只阻擋執行，不阻擋可完成的測試設計。
 - 帳密、JWT、Token、個資、設備清單、付款資料與登入 state 不進 Git。用環境變數或被忽略的本機設定；`.env` 不自動載入，見 README。
 - `automation/tests/` 的案例沿用 client、fixtures、Page Object、case metadata。預設只跑 synthetic local examples。live execution 與壓測範圍依本次使用者授權，不能繼承來源公司的歷史授權。
+- 新專案的 UI automation 預設 Python＋pytest＋Playwright；接手已有框架的專案時先沿用其選型，技術遷移依使用者指定範圍。此模板使用 plugin-managed page/context 與失敗附件設定，見 `automation/docs/ui-playwright.md`。
 - 只清理本輪擁有的資源。真實系統的破壞性／不可逆行為須有對應授權；讀取設定本身不代表獲准執行。
 - 專案測試／複驗的可交接點，依 `operations/README.md` 新增進度檔。框架單元測試不冒充產品測試。
 - 使用者要求完整 QA Cycle 或三個角色協作時，根 Agent 先委派 `qa_leader` 做 Gate，再依範圍分派 `manual_qa`、`automation_qa`，最後回 Leader review；遵守 `.agents/skills/qa-workflow/references/team.md`。單一交付物不強制拆分。
