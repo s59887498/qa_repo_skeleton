@@ -1,0 +1,49 @@
+name: Template checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  local-examples:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ['3.11', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - run: python -m pip install -e '.[dev,documents,protocol,reports]'
+      - run: python scripts/check_template.py
+      - run: ruff check .
+      - run: python -m pytest --run-protocol --junitxml=artifacts/junit.xml --results-json=artifacts/results.json
+      - run: python -m qa_demo.load --requests 24 --workers 4 --mode simultaneous --p95-ms 2000
+      - run: python scripts/export_cases.py qa/examples/catalog-cases.json artifacts/Demo_Readable.xlsx
+      - run: python scripts/validate_testcases.py artifacts/Demo_Readable.xlsx --warnings-as-errors
+      - run: python scripts/build_report.py artifacts/results.json artifacts/report.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: local-results-${{ matrix.python }}
+          path: artifacts/
+          retention-days: 7
+  browser-example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - run: python -m pip install -e '.[ui]'
+      - run: python -m pytest automation/tests/ui --run-ui --junitxml=artifacts/ui.xml --results-json=artifacts/ui.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-results
+          path: artifacts/
+          retention-days: 7

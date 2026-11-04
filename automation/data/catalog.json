@@ -1,0 +1,12 @@
+{
+  "denied_roles": [
+    {"case_id": "CAT-003", "role": "viewer", "title": "檢視者不可建立項目"},
+    {"case_id": "CAT-004", "role": "guest", "title": "訪客不可建立項目"}
+  ],
+  "name_boundaries": [
+    {"case_id": "CAT-005", "length": 0, "status": 422, "title": "拒絕空名稱"},
+    {"case_id": "CAT-006", "length": 1, "status": 201, "title": "接受最短名稱"},
+    {"case_id": "CAT-007", "length": 20, "status": 201, "title": "接受最長名稱"},
+    {"case_id": "CAT-008", "length": 21, "status": 422, "title": "拒絕超長名稱"}
+  ]
+}

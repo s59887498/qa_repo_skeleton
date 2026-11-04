@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate Test Report"
+  short_description: "依已確認來源完成 QA 交付，保留可追溯的範圍、證據與缺口"
+  default_prompt: "請使用 $generate-test-report 處理本次指定的 QA 範圍與交付物。"

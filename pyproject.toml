@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=77,<83"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qa-repo-skeleton"
+version = "0.1.0"
+description = "Portable QA workflow, agents, documents, and local automation examples"
+requires-python = ">=3.11"
+dependencies = ["pytest>=8,<10", "requests>=2.32.4,<3"]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.11,<1", "PyYAML>=6,<7"]
+ui = ["selenium>=4.30,<5"]
+protocol = ["websockets>=15,<16"]
+documents = ["openpyxl>=3.1,<4", "python-docx>=1.1,<2"]
+reports = ["allure-pytest>=2.13,<3"]
+
+[tool.setuptools.packages.find]
+where = ["automation/src"]
+
+[tool.setuptools.package-data]
+qa_demo = ["demo.html"]
+
+[tool.pytest.ini_options]
+testpaths = ["automation/tests", "tests"]
+addopts = "-ra --strict-markers"
+markers = [
+  "smoke: fast essential checks",
+  "regression: behavior regression",
+  "api: HTTP contract and flow tests",
+  "ui: browser tests (requires --run-ui)",
+  "protocol: WebSocket protocol examples (requires --run-protocol)",
+  "live: explicitly configured read-only live tests (requires --run-live)",
+  "case(id, title, steps, expected): traceable test case metadata",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

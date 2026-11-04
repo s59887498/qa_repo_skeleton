@@ -1,0 +1,38 @@
+{
+  "project_id": "demo-catalog",
+  "display_name": "Demo Catalog",
+  "timezone": "UTC",
+  "source_registry": "qa/docs/source-registry.example.md",
+  "environments": {
+    "local": {
+      "description": "Ephemeral loopback demo"
+    },
+    "qa": {
+      "base_url_env": "QA_BASE_URL",
+      "token_env": "QA_API_TOKEN"
+    }
+  },
+  "tracker": {
+    "provider": null,
+    "project": null,
+    "parent_task": null,
+    "section": null
+  },
+  "owners": {
+    "product": null,
+    "qa": null,
+    "engineering": null
+  },
+  "release_gate": {
+    "required_suites": [
+      "smoke",
+      "regression"
+    ],
+    "unresolved_blockers": "review_required"
+  },
+  "protocol": {
+    "enabled": false,
+    "contract_source": null
+  },
+  "notes": "Synthetic example; replace with the new project’s confirmed sources and routing."
+}

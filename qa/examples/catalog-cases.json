@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "CAT-001",
+      "title": "服務健康檢查",
+      "module": "Catalog API",
+      "priority": "High",
+      "state": "Not Started",
+      "source": "qa/examples/catalog-requirements.md#demo-req-001",
+      "preconditions": "已啟動本機 Demo Catalog；不需要真實帳號。",
+      "tags": [
+        "Smoke",
+        "Technique_UC"
+      ],
+      "steps": [
+        {
+          "action": "呼叫 GET /health。",
+          "expected": "HTTP 200，body 為 status=ok。"
+        }
+      ],
+      "cleanup": "function-scoped 本機服務結束即清除資料。",
+      "notes": "Synthetic demo；代表性案例，不是完整產品 coverage。"
+    },
+    {
+      "id": "CAT-002",
+      "title": "建立讀取與清理項目",
+      "module": "Catalog API",
+      "priority": "High",
+      "state": "Not Started",
+      "source": "qa/examples/catalog-requirements.md#demo-req-002",
+      "preconditions": "已啟動本機 Demo Catalog；不需要真實帳號。",
+      "tags": [
+        "Regression",
+        "Technique_UC"
+      ],
+      "steps": [
+        {
+          "action": "以 editor 建立 demo-item，依回傳 id 讀取；finally 刪除該 id 並重新讀取。",
+          "expected": "建立 201、讀回一致、刪除 200、刪後讀取 404。"
+        }
+      ],
+      "cleanup": "只刪除本案回傳的 id，並讀回確認 404。",
+      "notes": "Synthetic demo；代表性案例，不是完整產品 coverage。"
+    },
+    {
+      "id": "CAT-003",
+      "title": "檢視者不可建立項目",
+      "module": "Catalog API",
+      "priority": "High",
+      "state": "Not Started",
+      "source": "qa/examples/catalog-requirements.md#demo-req-002",
+      "preconditions": "已啟動本機 Demo Catalog；不需要真實帳號。",
+      "tags": [
+        "Regression",
+        "Technique_EP"
+      ],
+      "steps": [
+        {
+          "action": "以 viewer 建立名稱為 demo-item 的項目。",
+          "expected": "HTTP 403，error=forbidden。"
+        }
+      ],
+      "cleanup": "function-scoped 本機服務結束即清除資料。",
+      "notes": "Synthetic demo；代表性案例，不是完整產品 coverage。"
+    },
+    {
+      "id": "CAT-004",
+      "title": "訪客不可建立項目",
+      "module": "Catalog API",
+      "priority": "High",
+      "state": "Not Started",
+      "source": "qa/examples/catalog-requirements.md#demo-req-002",
+      "preconditions": "已啟動本機 Demo Catalog；不需要真實帳號。",
+      "tags": [
+        "Regression",
+        "Technique_EP"
+      ],
+      "steps": [
+        {
+          "action": "以 guest 建立名稱為 demo-item 的項目。",
+          "expected": "HTTP 403，error=forbidden。"
+        }
+      ],
+      "cleanup": "function-scoped 本機服務結束即清除資料。",
+      "notes": "Synthetic demo；代表性案例，不是完整產品 coverage。"
+    },
+    {
+      "id": "CAT-005",
+      "title": "拒絕空名稱",
+      "module": "Catalog API",
+      "priority": "High",
+      "state": "Not Started",
+      "source": "qa/examples/catalog-requirements.md#demo-req-003",
+      "preconditions": "已啟動本機 Demo Catalog；不需要真實帳號。",
+      "tags": [
+        "Regression",
+        "Technique_BVA"
+      ],
+      "steps": [
+        {
+          "action": "以 editor 建立名稱由 0 個 x 組成的項目。",
+          "expected": "HTTP 422；成功時名稱一致，拒絕時 error=invalid_name。"
+        }
+      ],
+      "cleanup": "function-scoped 本機服務結束即清除資料。",
+      "notes": "Synthetic demo；代表性案例，不是完整產品 coverage。"
+    },
+    {
+      "id": "CAT-006",
+      "title": "接受最短名稱",
+      "module": "Catalog API",
+      "priority": "High",
+      "state": "Not Started",
+      "source": "qa/examples/catalog-requirements.md#demo-req-003",
+      "preconditions": "已啟動本機 Demo Catalog；不需要真實帳號。",
+      "tags": [
+        "Regression",
+        "Technique_BVA"
+      ],
+      "steps": [
+        {
+          "action": "以 editor 建立名稱由 1 個 x 組成的項目。",
+          "expected": "HTTP 201；成功時名稱一致，拒絕時 error=invalid_name。"
+        }
+      ],
+      "cleanup": "function-scoped 本機服務結束即清除資料。",
+      "notes": "Synthetic demo；代表性案例，不是完整產品 coverage。"
+    },
+    {
+      "id": "CAT-007",
+      "title": "接受最長名稱",
+      "module": "Catalog API",
+      "priority": "High",
+      "state": "Not Started",
+      "source": "qa/examples/catalog-requirements.md#demo-req-003",
+      "preconditions": "已啟動本機 Demo Catalog；不需要真實帳號。",
+      "tags": [
+        "Regression",
+        "Technique_BVA"
+      ],
+      "steps": [
+        {
+          "action": "以 editor 建立名稱由 20 個 x 組成的項目。",
+          "expected": "HTTP 201；成功時名稱一致，拒絕時 error=invalid_name。"
+        }
+      ],
+      "cleanup": "function-scoped 本機服務結束即清除資料。",
+      "notes": "Synthetic demo；代表性案例，不是完整產品 coverage。"
+    },
+    {
+      "id": "CAT-008",
+      "title": "拒絕超長名稱",
+      "module": "Catalog API",
+      "priority": "High",
+      "state": "Not Started",
+      "source": "qa/examples/catalog-requirements.md#demo-req-003",
+      "preconditions": "已啟動本機 Demo Catalog；不需要真實帳號。",
+      "tags": [
+        "Regression",
+        "Technique_BVA"
+      ],
+      "steps": [
+        {
+          "action": "以 editor 建立名稱由 21 個 x 組成的項目。",
+          "expected": "HTTP 422；成功時名稱一致，拒絕時 error=invalid_name。"
+        }
+      ],
+      "cleanup": "function-scoped 本機服務結束即清除資料。",
+      "notes": "Synthetic demo；代表性案例，不是完整產品 coverage。"
+    },
+    {
+      "id": "UI-001",
+      "title": "由頁面建立項目並確認後端",
+      "module": "Catalog UI",
+      "priority": "High",
+      "state": "Not Started",
+      "source": "qa/examples/catalog-requirements.md#demo-req-005",
+      "preconditions": "已啟動本機服務，已安裝 Selenium 與 Chrome/driver。",
+      "tags": [
+        "Regression",
+        "Technique_UC"
+      ],
+      "steps": [
+        {
+          "action": "開啟 /ui，輸入 demo-from-ui 並按建立；讀回回傳 id 的 API。",
+          "expected": "顯示已建立：demo-from-ui；API 的 name 完全一致。"
+        }
+      ],
+      "cleanup": "function-scoped 本機服務結束即清除資料。",
+      "notes": "Synthetic demo；代表性案例，不是完整產品 coverage。"
+    },
+    {
+      "id": "PROTO-001",
+      "title": "Heartbeat 請求回應關聯",
+      "module": "Protocol",
+      "priority": "High",
+      "state": "Not Started",
+      "source": "qa/examples/catalog-requirements.md#demo-req-006",
+      "preconditions": "安裝 protocol extra；無需外部設備。",
+      "tags": [
+        "Regression",
+        "Technique_UC"
+      ],
+      "steps": [
+        {
+          "action": "以 ocpp1.6 subprotocol 連本機 WebSocket，送出唯一 id 的 Heartbeat CALL。",
+          "expected": "收到同一 id 的 CALLRESULT，含可解析的 UTC currentTime。"
+        }
+      ],
+      "cleanup": "function-scoped 本機服務結束即清除資料。",
+      "notes": "Synthetic demo；代表性案例，不是完整產品 coverage。"
+    }
+  ]
+}

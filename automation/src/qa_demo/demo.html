@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-Hant">
+<meta charset="utf-8">
+<title>Demo Catalog</title>
+<style>body{font:18px system-ui;max-width:40rem;margin:4rem auto}input,button{font:inherit;padding:.5rem}label{display:block}</style>
+<h1>Demo Catalog</h1>
+<form id="item-form">
+  <label for="item-name">項目名稱</label>
+  <input id="item-name" data-testid="item-name" name="name" required maxlength="20">
+  <button data-testid="create-item">建立項目</button>
+</form>
+<p role="status" data-testid="result"></p>
+<script>
+document.querySelector('#item-form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const result = document.querySelector('[data-testid="result"]');
+  try {
+    const response = await fetch('/items', {
+      method: 'POST', headers: {'Content-Type':'application/json', 'X-Demo-Role':'editor'},
+      body: JSON.stringify({name: document.querySelector('#item-name').value})
+    });
+    const item = await response.json();
+    if (!response.ok) throw new Error('建立失敗');
+    result.textContent = `已建立：${item.name}`;
+    result.dataset.itemId = item.id;
+  } catch (_) { result.textContent = '建立失敗'; }
+});
+</script>
+</html>
